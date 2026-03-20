@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.colors import hsv_to_rgb
 from matplotlib.backends.backend_pdf import PdfPages
 
 CONDITIONS = [
@@ -109,10 +110,69 @@ def make_fig_rt(df, pid=None):
     fig.tight_layout(rect=[0, 0.02, 1, 0.95])
     return fig
 
-def save_pdf(fig1, fig2, output_path):
+def build_accuracy_table(datasets):
+    rows = []
+    for pid, df in datasets:
+        row = {'participant': pid}
+        for lc, ic, label, _ in CONDITIONS:
+            cond = df[(df['load_condition'] == lc) & (df['icon_category'] == ic)]
+            row[label] = cond['czy_poprawna'].mean() * 100 if len(cond) else float('nan')
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+def make_participant_colors(n):
+    if n <= 0:
+        return []
+    return [hsv_to_rgb((idx / n, 0.7, 0.85)) for idx in range(n)]
+
+def make_fig_accuracy_spaghetti(acc_table):
+    labels = [label for _, _, label, _ in CONDITIONS]
+    x = list(range(len(labels)))
+    fig, ax = plt.subplots(figsize=(11, 6))
+    fig.suptitle("Poprawnosc odpowiedzi - spaghetti plot", fontsize=13, fontweight='bold')
+
+    colors = make_participant_colors(len(acc_table))
+    for idx, (_, row) in enumerate(acc_table.iterrows()):
+        ax.plot(
+            x,
+            row[labels].tolist(),
+            color=colors[idx],
+            linewidth=1.6,
+            marker='o',
+            markersize=5,
+            alpha=0.9
+        )
+
+    mean_values = acc_table[labels].mean(axis=0, skipna=True)
+    ax.plot(
+        x,
+        mean_values,
+        color='black',
+        linewidth=3.2,
+        linestyle='dashdot',
+        marker='o',
+        markersize=7,
+        label='Srednia grupy',
+        zorder=10
+    )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=12, ha='right')
+    ax.set_ylabel('Poprawnosc (%)', fontsize=10)
+    ax.set_ylim(0, 105)
+    ax.axhline(100, color='lightgray', ls='--', lw=0.8)
+    ax.axhline(50, color='gray', ls=':', lw=0.8)
+    ax.grid(axis='y', color='0.88', linewidth=0.8)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.legend(frameon=False, loc='lower left')
+    fig.tight_layout(rect=[0, 0.02, 1, 0.95])
+    return fig
+
+def save_pdf(*figs, output_path):
     with PdfPages(output_path) as pdf:
-        pdf.savefig(fig1, bbox_inches='tight')
-        pdf.savefig(fig2, bbox_inches='tight')
+        for fig in figs:
+            pdf.savefig(fig, bbox_inches='tight')
     print(f"PDF zapisany: {output_path}")
 
 def find_data_files():
@@ -168,8 +228,16 @@ def pick_file():
     choice = input("\nWybierz numer: ").strip()
     if choice == '0':
         return None
+    if not choice.isdigit():
         print("Nieprawidlowy wybor.")
         sys.exit(1)
+
+    idx = int(choice) - 1
+    if idx < 0 or idx >= len(files):
+        print("Nieprawidlowy wybor.")
+        sys.exit(1)
+
+    return os.path.join(DATA_DIR, files[idx])
 
 def process_file(input_file, output_file):
     print(f"\nWczytuję: {os.path.basename(input_file)}")
@@ -179,8 +247,9 @@ def process_file(input_file, output_file):
     print_summary(df)
     fig1 = make_fig_accuracy(df, pid)
     fig2 = make_fig_rt(df, pid)
-    save_pdf(fig1, fig2, output_file)
+    save_pdf(fig1, fig2, output_path=output_file)
     plt.close('all')
+    return pid, df
 
 def main():
     if len(sys.argv) >= 2:
@@ -195,13 +264,20 @@ def main():
         os.makedirs(PLOTS_DIR, exist_ok=True)
         files = get_data_files()
         print(f"\nPrzetwarzam {len(files)} plikow -> {PLOTS_DIR}")
+        datasets = []
         for fname in files:
             input_file  = os.path.join(DATA_DIR, fname)
             output_file = os.path.join(PLOTS_DIR, os.path.splitext(fname)[0] + '_wykres.pdf')
             try:
-                process_file(input_file, output_file)
+                datasets.append(process_file(input_file, output_file))
             except Exception as e:
                 print(f"  BLAD ({fname}): {e}")
+        if datasets:
+            acc_table = build_accuracy_table(datasets)
+            fig = make_fig_accuracy_spaghetti(acc_table)
+            group_output = os.path.join(PLOTS_DIR, 'group_accuracy_spaghetti.pdf')
+            save_pdf(fig, output_path=group_output)
+            plt.close(fig)
         print(f"\nGotowe. Wykresy zapisane w: {PLOTS_DIR}")
     else:
         output_file = os.path.splitext(choice)[0] + '_wykres.pdf'
