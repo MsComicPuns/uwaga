@@ -799,11 +799,7 @@ def show_instruction(text, wait_for_space=True):
 instruction_1 = """Dziękujemy za twój udział w badaniu.
 
 Twoim zadaniem jest jak najszybsze reagowanie na pojawiający się 
-na ekranie obiekt (bodziec docelowy), którym będzie trójkąt lub romb.
-
-Na następnych slajdach zostanie ci zaprezentowany przykładowy 
-wygląd planszy jaka będzie użyta w zadaniu i dokładna instrukcja 
-przebiegu badania.
+na ekranie obiekt, którym będzie trójkąt lub romb.
 
 Naciśnij spację, żeby kontynuować."""
 
@@ -862,6 +858,8 @@ Pamiętaj:
 - klawisz A (lewa ręka) = TRÓJKĄT
 - klawisz L (prawa ręka) = ROMB
 
+Po naciśnięciu klawisza odpowiedzi, wciśnij spację aby przejść do kolejnej próby.
+
 Na początku rozpoczniesz sesję treningową, 
 żeby nauczyć się wykonywać badanie.
 
@@ -873,6 +871,9 @@ po każdym z nich, będziesz miał/a chwilę przerwy.
 Pamiętaj:
 - klawisz L (prawa ręka) = TRÓJKĄT
 - klawisz A (lewa ręka) = ROMB
+
+
+Po naciśnięciu klawisza odpowiedzi, wciśnij spację aby przejść do kolejnej próby.
 
 Na początku rozpoczniesz sesję treningową, 
 żeby nauczyć się wykonywać badanie.
