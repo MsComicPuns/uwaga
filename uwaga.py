@@ -41,7 +41,7 @@ wersja = A
 
 [IKONA]
 icon_in_center = True
-icon_size = 0.10
+icon_size = 0.9
 
 [KSZTALTY]
 use_colors = False
@@ -53,7 +53,7 @@ radius = 0.25
 n_shapes = 6
 
 [CZASY]
-fixation_time = 0.5
+fixation_time = 1.0
 stimulus_time = 0.1
 max_response_time = 2.0
 feedback_time = 0.5
@@ -88,7 +88,7 @@ wersja = A
 
 [IKONA]
 icon_in_center = True
-icon_size = 0.10
+icon_size = 0.9
 
 [KSZTALTY]
 use_colors = False
@@ -100,7 +100,7 @@ radius = 0.25
 n_shapes = 6
 
 [CZASY]
-fixation_time = 0.5
+fixation_time = 1.0
 stimulus_time = 0.1
 max_response_time = 2.0
 feedback_time = 0.5
@@ -428,12 +428,13 @@ neutral_queue = make_balanced_queue(neutral_images)
 fixation = visual.ShapeStim(
     win,
     vertices='cross',
-    size=(CFG['fixation_size'], CFG['fixation_size']),
-    lineColor='white',
-    fillColor='white'
+    size=(0.05, 0.05),
+    lineColor='black',
+    fillColor='black',
+    lineWidth=0.1
 )
 
-app_icon = visual.ImageStim(win, size=(CFG['icon_size'], CFG['icon_size']), pos=(0, 0))
+app_icon = visual.ImageStim(win, size=(CFG['icon_size'] * 1.8, CFG['icon_size'] * 1.8), pos=(0, 0))
 
 def create_shape(shape_type, size=None, color='white'):
     if size is None:
@@ -587,6 +588,16 @@ def run_trial(trial_params, trial_number, block_number, is_practice=False):
         correct_key = KEY_DIAMOND
 
     # --- Fiksacja ---
+    win.flip()
+
+    timer = core.Clock()
+    core.wait(CFG['stimulus_time'])
+
+    # --- Pusty ekran po planszy ---
+    win.flip()
+    core.wait(0.2)
+
+    # --- Fiksacja ---
     fixation.draw()
     win.flip()
     core.wait(CFG['fixation_time'])
@@ -594,17 +605,12 @@ def run_trial(trial_params, trial_number, block_number, is_practice=False):
     # --- Ekspozycja bodźców ---
     for shape in trial_shapes:
         shape.draw()
-
     app_icon.draw()
-
-    fixation.draw()
     win.flip()
-
     timer = core.Clock()
     core.wait(CFG['stimulus_time'])
 
-    # --- Pusta ekran (tylko fiksacja) po ekspozycji ---
-    fixation.draw()
+    # --- Pusta po ekspozycji ---
     win.flip()
 
     response = None
