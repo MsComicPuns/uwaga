@@ -41,7 +41,7 @@ wersja = A
 
 [IKONA]
 icon_in_center = True
-icon_size = 0.9
+icon_size = 0.2
 
 [KSZTALTY]
 use_colors = False
@@ -434,7 +434,13 @@ fixation = visual.ShapeStim(
     lineWidth=0.1
 )
 
-app_icon = visual.ImageStim(win, size=(CFG['icon_size'] * 1.8, CFG['icon_size'] * 1.8), pos=(0, 0))
+ICON_SIZE = (CFG['icon_size'], CFG['icon_size'])
+
+app_icon = visual.ImageStim(
+    win,
+    size=ICON_SIZE,
+    pos=(0, 0),
+)
 
 def create_shape(shape_type, size=None, color='white'):
     if size is None:
