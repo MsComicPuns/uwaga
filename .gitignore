@@ -2,9 +2,15 @@
 .idea
 
 data/*
-!data/.gitkeep
+!data/configs/
+data/configs/*
 !data/configs/.gitkeep
+
+!data/summaries/
+data/summaries/*
 !data/summaries/.gitkeep
+
+!data/.gitkeep
 
 plots/*
 !plots/.gitkeep
