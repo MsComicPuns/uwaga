@@ -3,6 +3,8 @@
 
 data/*
 !data/.gitkeep
+!data/configs/.gitignore
+!data/summaries/.gitignore
 
 plots/*
 !plots/.gitkeep
