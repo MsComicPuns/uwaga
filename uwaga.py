@@ -555,10 +555,8 @@ def run_trial(trial_params, trial_number, block_number, is_practice=False):
     colors_data = []
 
     if load == 'low':
-        # LL: wszystkie dystraktory identyczne (1 losowy ksztalt != target)
-        distractor_pool = [d for d in DISTRACTORS if d != target_shape]
-        single_distractor = random.choice(distractor_pool)
-        distractors_for_trial = [single_distractor] * n_distractors
+        # LL: wszystkie dystraktory sa kolami
+        distractors_for_trial = ['circle'] * n_distractors
     else:
         # HL: wszystkie ksztalty rozne (target + kazdy dystraktor unikalny)
         available_distractors = [d for d in DISTRACTORS if d != target_shape]
